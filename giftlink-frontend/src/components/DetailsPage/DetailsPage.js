@@ -1,198 +1,223 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import urlConfig from "../../config";
-import "./DetailsPage.css";
+import React from 'react';
+import { Link, useParams } from 'react-router-dom';
+import './DetailsPage.css';
 
-function DetailsPage() {
-    const [gift, setGift] = useState(null);
-    const [comments, setComments] = useState([]);
-    const [error, setError] = useState("");
+const gifts = {
+  1: {
+    title: 'Personalized Gift Box',
+    category: 'Birthday',
+    price: '$49.99',
+    emoji: '🎁',
+    description:
+      'A beautiful personalized gift box carefully created for someone special. Make their day memorable with a thoughtful collection of gifts.',
+    features: [
+      'Personalized gift selection',
+      'Premium packaging',
+      'Perfect for birthdays',
+      'Ready to gift',
+    ],
+  },
 
-    const navigate = useNavigate();
-    const { productId } = useParams();
+  2: {
+    title: 'Luxury Self Care Kit',
+    category: 'Wellness',
+    price: '$39.99',
+    emoji: '🧴',
+    description:
+      'A relaxing collection designed for comfort, wellness and self-care. A thoughtful choice for someone who deserves a little time for themselves.',
+    features: [
+      'Premium self-care products',
+      'Relaxation focused',
+      'Beautiful presentation',
+      'Perfect wellness gift',
+    ],
+  },
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
+  3: {
+    title: 'Premium Coffee Set',
+    category: 'Lifestyle',
+    price: '$34.99',
+    emoji: '☕',
+    description:
+      'A premium coffee experience for coffee lovers. A simple yet thoughtful gift for everyday moments.',
+    features: [
+      'Premium coffee selection',
+      'Elegant packaging',
+      'Perfect for coffee lovers',
+      'Everyday lifestyle gift',
+    ],
+  },
 
-        const token = sessionStorage.getItem("token");
+  4: {
+    title: 'Creative Art Kit',
+    category: 'Creative',
+    price: '$29.99',
+    emoji: '🎨',
+    description:
+      'A creative gift set designed for artists, creators and anyone who enjoys exploring their imagination.',
+    features: [
+      'Creative supplies',
+      'Great for beginners',
+      'Fun and engaging',
+      'Perfect creative gift',
+    ],
+  },
+};
 
-        if (!token) {
-            navigate("/app/login");
-            return;
-        }
+export default function DetailsPage() {
+  const { id } = useParams();
 
-        const fetchGiftDetails = async () => {
-            try {
-                const response = await fetch(
-                    `${urlConfig.backendUrl}/api/gifts/${productId}`
-                );
+  const gift = gifts[id] || gifts[1];
 
-                if (!response.ok) {
-                    throw new Error(
-                        `HTTP error; ${response.status}`
-                    );
-                }
+  return (
+    <div className="details-page">
 
-                const data = await response.json();
+      <div className="details-container">
 
-                setGift(data);
-
-                if (data.comments) {
-                    setComments(data.comments);
-                } else {
-                    setComments([]);
-                }
-            } catch (error) {
-                console.log(
-                    "Fetch error: " + error.message
-                );
-
-                setError(
-                    "Unable to fetch gift details. Please try again."
-                );
-            }
-        };
-
-        fetchGiftDetails();
-    }, [navigate, productId]);
-
-    const formatDate = (timestamp) => {
-        if (!timestamp) {
-            return "Date not available";
-        }
-
-        const date = new Date(timestamp * 1000);
-
-        return date.toLocaleDateString("default", {
-            month: "long",
-            day: "numeric",
-            year: "numeric"
-        });
-    };
-
-    const handleBack = () => {
-        navigate(-1);
-    };
-
-    if (error) {
-        return (
-            <div className="container mt-5">
-                <div className="alert alert-danger">
-                    {error}
-                </div>
-
-                <button
-                    className="btn btn-secondary"
-                    onClick={handleBack}
-                >
-                    Back
-                </button>
-            </div>
-        );
-    }
-
-    if (!gift) {
-        return (
-            <div className="container mt-5">
-                <div className="text-center">
-                    Loading gift details...
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <div className="container mt-5 mb-5">
-            <button
-                className="btn btn-secondary mb-4"
-                onClick={handleBack}
-            >
-                ← Back
-            </button>
-
-            <div className="card shadow">
-                <div className="card-header">
-                    <h2 className="details-title mb-0">
-                        {gift.name}
-                    </h2>
-                </div>
-
-                <div className="card-body">
-                    <div className="image-placeholder-large mb-4">
-                        {gift.image ? (
-                            <img
-                                src={gift.image}
-                                alt={gift.name}
-                                className="product-image-large"
-                            />
-                        ) : (
-                            <div className="no-image-available-large">
-                                No Image Available
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="gift-details">
-                        <h3>{gift.name}</h3>
-
-                        <p>
-                            <strong>Category:</strong>{" "}
-                            {gift.category}
-                        </p>
-
-                        <p>
-                            <strong>Condition:</strong>{" "}
-                            {gift.condition}
-                        </p>
-
-                        <p>
-                            <strong>Date Added:</strong>{" "}
-                            {formatDate(gift.date_added)}
-                        </p>
-
-                        <p>
-                            <strong>Age:</strong>{" "}
-                            {gift.age_years} years
-                        </p>
-
-                        <p>
-                            <strong>Description:</strong>
-                        </p>
-
-                        <p>
-                            {gift.description ||
-                                "No description available."}
-                        </p>
-                    </div>
-
-                    <div className="comments-section mt-5">
-                        <h4>Comments</h4>
-
-                        {comments.length > 0 ? (
-                            comments.map((comment, index) => (
-                                <div
-                                    className="comment-item"
-                                    key={index}
-                                >
-                                    <p className="mb-0">
-                                        {typeof comment === "string"
-                                            ? comment
-                                            : comment.comment ||
-                                              comment.text ||
-                                              ""}
-                                    </p>
-                                </div>
-                            ))
-                        ) : (
-                            <p className="text-muted">
-                                No comments available.
-                            </p>
-                        )}
-                    </div>
-                </div>
-            </div>
+        {/* Breadcrumb */}
+        <div className="details-breadcrumb">
+          <Link to="/app">Home</Link>
+          <span>›</span>
+          <Link to="/app/search">Gifts</Link>
+          <span>›</span>
+          <strong>{gift.title}</strong>
         </div>
-    );
-}
 
-export default DetailsPage;
+        {/* Main Product */}
+        <section className="details-card">
+
+          {/* Image */}
+          <div className="details-image-section">
+
+            <div className="details-image">
+              <span>{gift.emoji}</span>
+
+              <button className="details-favorite">
+                ♡
+              </button>
+            </div>
+
+            <div className="details-thumbnails">
+              <div className="thumbnail active">
+                {gift.emoji}
+              </div>
+
+              <div className="thumbnail">
+                ✨
+              </div>
+
+              <div className="thumbnail">
+                🎀
+              </div>
+            </div>
+          </div>
+
+          {/* Information */}
+          <div className="details-info">
+
+            <span className="details-category">
+              {gift.category}
+            </span>
+
+            <h1>{gift.title}</h1>
+
+            <div className="details-rating">
+              <span>★★★★★</span>
+              <small>4.9 · 24 reviews</small>
+            </div>
+
+            <div className="details-price">
+              {gift.price}
+            </div>
+
+            <p className="details-description">
+              {gift.description}
+            </p>
+
+            <div className="details-divider"></div>
+
+            <div className="details-features">
+              <h3>What's included</h3>
+
+              {gift.features.map((feature) => (
+                <div
+                  className="detail-feature"
+                  key={feature}
+                >
+                  <span>✓</span>
+                  <p>{feature}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="details-actions">
+              <button className="gift-primary-button">
+                Add to wishlist
+                <span>♡</span>
+              </button>
+
+              <button className="gift-secondary-button">
+                Share
+                <span>↗</span>
+              </button>
+            </div>
+
+            <div className="details-note">
+              <span>✓</span>
+              <div>
+                <strong>A thoughtful choice</strong>
+                <p>
+                  Selected to make your special moments
+                  more memorable.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* Bottom Information */}
+        <section className="details-bottom">
+
+          <div>
+            <span className="bottom-icon">🎁</span>
+
+            <div>
+              <h3>Thoughtfully selected</h3>
+              <p>
+                Every GiftLink item is selected with
+                meaningful moments in mind.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <span className="bottom-icon">✨</span>
+
+            <div>
+              <h3>Perfect for gifting</h3>
+              <p>
+                Beautiful choices for birthdays,
+                celebrations and everyday moments.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <span className="bottom-icon">❤️</span>
+
+            <div>
+              <h3>Made with care</h3>
+              <p>
+                Discover gifts that communicate
+                thoughtfulness and appreciation.
+              </p>
+            </div>
+          </div>
+
+        </section>
+
+      </div>
+    </div>
+  );
+}
