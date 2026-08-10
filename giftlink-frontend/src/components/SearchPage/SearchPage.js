@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './SearchPage.css';
-import urlConfig from '../../config/urlConfig';
+import {urlConfig} from '../../config';
 
 function SearchPage() {
     const [searchQuery, setSearchQuery] = useState('');

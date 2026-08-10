@@ -1,29 +1,83 @@
-import React, { useState } from "react";
-import "./RegisterPage.css";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import './RegisterPage.css';
+import urlConfig from '../../config';
+import { useAppContext } from '../../context/AuthContext';
 
 function RegisterPage() {
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    // Form states
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    // Error message state
+    const [showerr, setShowerr] = useState('');
+
+    // Navigation and authentication context
+    const navigate = useNavigate();
+    const { setIsLoggedIn } = useAppContext();
 
     const handleRegister = async () => {
-        console.log("Register invoked");
-        console.log("First Name:", firstName);
-        console.log("Last Name:", lastName);
-        console.log("Email:", email);
-        console.log("Password:", password);
+        try {
+            // Step 1: Call registration API
+            const response = await fetch(
+                `${urlConfig.backendUrl}/api/auth/register`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        firstName: firstName,
+                        lastName: lastName,
+                        email: email,
+                        password: password
+                    })
+                }
+            );
+
+            // Step 2: Access JSON response
+            const json = await response.json();
+
+            // Successful registration
+            if (json.authtoken) {
+                // Store authentication/user details
+                sessionStorage.setItem('auth-token', json.authtoken);
+                sessionStorage.setItem('name', firstName);
+                sessionStorage.setItem('email', json.email);
+
+                // Update login state
+                setIsLoggedIn(true);
+
+                // Navigate to MainPage
+                navigate('/app');
+            }
+
+            // Registration error
+            if (json.error) {
+                setShowerr(json.error);
+            }
+
+        } catch (e) {
+            console.log('Error fetching details: ' + e.message);
+            setShowerr('Registration failed. Please try again.');
+        }
     };
 
     return (
         <div className="container mt-5">
             <div className="row justify-content-center">
                 <div className="col-md-6 col-lg-4">
+
                     <div className="register-card p-4 border rounded">
+
                         <h2 className="text-center mb-4 font-weight-bold">
                             Register
                         </h2>
 
+                        {/* First Name */}
                         <div className="mb-4">
                             <label
                                 htmlFor="firstName"
@@ -44,6 +98,7 @@ function RegisterPage() {
                             />
                         </div>
 
+                        {/* Last Name */}
                         <div className="mb-4">
                             <label
                                 htmlFor="lastName"
@@ -64,6 +119,7 @@ function RegisterPage() {
                             />
                         </div>
 
+                        {/* Email */}
                         <div className="mb-4">
                             <label
                                 htmlFor="email"
@@ -82,8 +138,16 @@ function RegisterPage() {
                                     setEmail(e.target.value)
                                 }
                             />
+
+                            {/* Registration error */}
+                            {showerr && (
+                                <div className="text-danger mt-2">
+                                    {showerr}
+                                </div>
+                            )}
                         </div>
 
+                        {/* Password */}
                         <div className="mb-4">
                             <label
                                 htmlFor="password"
@@ -104,6 +168,7 @@ function RegisterPage() {
                             />
                         </div>
 
+                        {/* Register Button */}
                         <button
                             type="button"
                             className="btn btn-primary w-100"
@@ -112,8 +177,9 @@ function RegisterPage() {
                             Register
                         </button>
 
+                        {/* Login Link */}
                         <p className="mt-4 text-center">
-                            Already a member?{" "}
+                            Already a member?{' '}
                             <a
                                 href="/app/login"
                                 className="text-primary"
@@ -121,6 +187,7 @@ function RegisterPage() {
                                 Login
                             </a>
                         </p>
+
                     </div>
                 </div>
             </div>
