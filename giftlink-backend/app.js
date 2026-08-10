@@ -14,6 +14,9 @@ app.use("/api/search", searchRoutes);
 const sentimentRoutes = require("./routes/sentimentRoutes");
 app.use("/sentiment", sentimentRoutes);
 
+const authRoutes = require('./routes/authRoutes');
+app.use('/api/auth', authRoutes);
+
 const PORT = process.env.PORT || 3060;
 
 app.listen(PORT, () => {
