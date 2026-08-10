@@ -68,4 +68,70 @@ router.post('/register', async (req, res) => {
     }
 });
 
+router.post('/login', async (req, res) => {
+    try {
+        // Task 1: Connect to MongoDB
+        const db = await connectToDatabase();
+
+        // Task 2: Access users collection
+        const collection = db.collection("users");
+
+        // Task 3: Find user by email
+        const theUser = await collection.findOne({
+            email: req.body.email
+        });
+
+        // Task 7: User not found
+        if (!theUser) {
+            logger.error('User not found');
+            return res.status(404).json({
+                error: 'User not found'
+            });
+        }
+
+        // Task 4: Check password
+        const result = await bcryptjs.compare(
+            req.body.password,
+            theUser.password
+        );
+
+        if (!result) {
+            logger.error('Passwords do not match');
+            return res.status(404).json({
+                error: 'Wrong password'
+            });
+        }
+
+        // Task 5: Get user details
+        const userName = theUser.firstName;
+        const userEmail = theUser.email;
+
+        // Task 6: Create JWT payload
+        const payload = {
+            user: {
+                id: theUser._id.toString()
+            }
+        };
+
+        // Create authentication token
+        const authtoken = jwt.sign(
+            payload,
+            JWT_SECRET
+        );
+
+        logger.info('User logged in successfully');
+
+        // Send response
+        res.json({
+            authtoken,
+            userName,
+            userEmail
+        });
+
+    } catch (e) {
+        logger.error(e);
+        return res.status(500).send('Internal server error');
+    }
+});
+
 module.exports = router;
