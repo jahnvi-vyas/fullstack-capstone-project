@@ -1,7 +1,7 @@
 const express = require('express');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const connectToDatabase = require('../models/db');
+const { connectToDatabase } = require('../models/db');
 const dotenv = require('dotenv');
 const pino = require('pino');
 const { body, validationResult } = require('express-validator');
@@ -16,7 +16,9 @@ const JWT_SECRET = process.env.JWT_SECRET;
 router.post('/register', async (req, res) => {
     try {
         // Task 1: Connect to giftsdb
+        console.log('1');
         const db = await connectToDatabase();
+        console.log('2',db)
 
         // Task 2: Access users collection
         const collection = db.collection('users');

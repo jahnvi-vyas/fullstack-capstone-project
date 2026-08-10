@@ -1,13 +1,15 @@
 const express = require("express");
 const router = express.Router();
 
-const { connectToDatabase } = require("../db");
+const { connectToDatabase } = require("../models/db");
 
 router.get("/gifts", async (req, res) => {
     try {
+        console.log('1')
         const db = await connectToDatabase();
+        console.log('2',db)
         const collection = db.collection("items");
-
+        console.log('3',collection)
         const gifts = await collection.find({}).toArray();
 
         res.status(200).json(gifts);

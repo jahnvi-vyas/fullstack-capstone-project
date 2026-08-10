@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { connectToDatabase } = require("../db");
+const { connectToDatabase } = require("../models/db");
 
 router.get("/search", async (req, res) => {
     try {
