@@ -1,51 +1,35 @@
 const express = require("express");
 const router = express.Router();
 
-const connectToDatabase = require("../models/db");
+const { connectToDatabase } = require("../db");
 
-// GET /api/gifts
-router.get("/", async (req, res) => {
+router.get("/gifts", async (req, res) => {
     try {
-        // Task 1: Connect to MongoDB
         const db = await connectToDatabase();
+        const collection = db.collection("items");
 
-        // Task 2: Access gifts collection
-        const collection = db.collection("gifts");
-
-        // Task 3: Fetch all gifts
         const gifts = await collection.find({}).toArray();
 
-        // Task 4: Return gifts
-        res.json(gifts);
-    } catch (error) {
-        console.error(error);
+        res.status(200).json(gifts);
+    } catch (e) {
+        console.error(e);
         res.status(500).json({
-            error: "Failed to retrieve gifts"
+            error: "Internal server error"
         });
     }
 });
 
-// GET /api/gifts/:id
-router.get("/:id", async (req, res) => {
+router.get("/gifts/:id", async (req, res) => {
     try {
-        // Get ID from URL
-        const id = req.params.id;
-
-        // Task 1: Connect to MongoDB
         const db = await connectToDatabase();
+        const collection = db.collection("items");
 
-        // Task 2: Access gifts collection
-        const collection = db.collection("gifts");
+        // Your existing ObjectId lookup code goes here
 
-        // Task 3: Find specific gift by ID
-        const gift = await collection.findOne({ id: id });
-
-        // Return gift
-        res.json(gift);
-    } catch (error) {
-        console.error(error);
+    } catch (e) {
+        console.error(e);
         res.status(500).json({
-            error: "Failed to retrieve gift"
+            error: "Internal server error"
         });
     }
 });

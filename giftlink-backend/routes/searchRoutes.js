@@ -1,48 +1,28 @@
 const express = require("express");
 const router = express.Router();
 
-const connectToDatabase = require("../models/db");
+const { connectToDatabase } = require("../db");
 
-router.get("/", async (req, res) => {
+router.get("/search", async (req, res) => {
     try {
-        // Task 1: Connect to MongoDB
         const db = await connectToDatabase();
+        const collection = db.collection("items");
 
-        // Get gifts collection
-        const collection = db.collection("gifts");
+        const { category } = req.query;
 
-        // Query object for filters
-        const query = {};
+        let query = {};
 
-        // Task 2: Add name filter
-        if (req.query.name && req.query.name.trim() !== "") {
-            query.name = req.query.name;
+        if (category) {
+            query.category = category;
         }
 
-        // Task 3: Add other filters
-        if (req.query.category) {
-            query.category = req.query.category;
-        }
+        const results = await collection.find(query).toArray();
 
-        if (req.query.condition) {
-            query.condition = req.query.condition;
-        }
-
-        if (req.query.age_years) {
-            query.age_years = {
-                $lte: parseInt(req.query.age_years)
-            };
-        }
-
-        // Task 4: Fetch filtered gifts
-        const gifts = await collection.find(query).toArray();
-
-        res.json(gifts);
-    } catch (error) {
-        console.error(error);
-
+        res.status(200).json(results);
+    } catch (e) {
+        console.error(e);
         res.status(500).json({
-            error: "Failed to search gifts"
+            error: "Internal server error"
         });
     }
 });

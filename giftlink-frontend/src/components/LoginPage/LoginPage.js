@@ -25,38 +25,36 @@ export default function LoginPage() {
     }
 
     try {
-      setLoading(true);
-
-      const response = await fetch(
-        `${urlConfig.backendUrl}/api/auth/login`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-        }
-      );
-
-      const json = await response.json();
-
-      if (response.ok && json.authtoken) {
-        sessionStorage.setItem('auth-token', json.authtoken);
-        sessionStorage.setItem('name', json.userName);
-        sessionStorage.setItem('email', json.userEmail);
-
-        setUserName(json.userName);
-        setIsLoggedIn(true);
-
-        navigate('/app');
-      } else {
-        setError(
-          json.error || 'Invalid email or password. Please try again.'
+        setLoading(true);
+        const response = await fetch(
+            `${urlConfig.backendUrl}/api/auth/login`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${sessionStorage.getItem("auth-token")}`
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            }
         );
-      }
+        const json = await response.json();
+        if (response.ok && json.authtoken) {
+            sessionStorage.setItem('auth-token', json.authtoken);
+            sessionStorage.setItem('name', json.userName);
+            sessionStorage.setItem('email', json.userEmail);
+
+            setUserName(json.userName);
+            setIsLoggedIn(true);
+
+            navigate('/app');
+        } else {
+            setError(
+            json.error || 'Invalid email or password. Please try again.'
+            );
+        }
     } catch (err) {
       console.error('Login error:', err);
       setError('Unable to connect to the server. Please try again.');

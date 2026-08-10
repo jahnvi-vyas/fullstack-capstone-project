@@ -6,16 +6,12 @@ const app = express();
 app.use(express.json());
 
 const giftRoutes = require("./routes/giftRoutes");
-app.use("/api/gifts", giftRoutes);
-
 const searchRoutes = require("./routes/searchRoutes");
-app.use("/api/search", searchRoutes);
+const authRoutes = require("./routes/authRoutes");
 
-const sentimentRoutes = require("./routes/sentimentRoutes");
-app.use("/sentiment", sentimentRoutes);
-
-const authRoutes = require('./routes/authRoutes');
-app.use('/api/auth', authRoutes);
+app.use("/api", giftRoutes);
+app.use("/api", searchRoutes);
+app.use("/api/auth", authRoutes);
 
 const PORT = process.env.PORT || 3060;
 

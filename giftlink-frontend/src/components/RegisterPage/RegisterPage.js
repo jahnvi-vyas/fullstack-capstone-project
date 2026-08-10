@@ -17,22 +17,20 @@ export default function RegisterPage() {
 
     const handleRegister = async (e) => {
         e.preventDefault();
-
         setShowerr('');
-
         try {
             const response = await fetch(
                 `${urlConfig.backendUrl}/api/auth/register`,
                 {
-                    method: 'POST',
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        firstName,
-                        lastName,
-                        email,
-                        password
+                        firstName: firstName,
+                        lastName: lastName,
+                        email: email,
+                        password: password
                     })
                 }
             );
@@ -40,47 +38,19 @@ export default function RegisterPage() {
             const json = await response.json();
 
             if (json.authtoken) {
-
-                sessionStorage.setItem(
-                    'auth-token',
-                    json.authtoken
-                );
-
-                sessionStorage.setItem(
-                    'name',
-                    firstName
-                );
-
-                sessionStorage.setItem(
-                    'email',
-                    json.email || email
-                );
+                sessionStorage.setItem("auth-token", json.authtoken);
+                sessionStorage.setItem("name", firstName);
+                sessionStorage.setItem("email", json.email);
 
                 setIsLoggedIn(true);
-
-                navigate('/app');
-
-            } else if (json.error) {
-
-                setShowerr(json.error);
-
-            } else {
-
-                setShowerr(
-                    'Registration failed. Please try again.'
-                );
+                navigate("/app");
             }
 
-        } catch (error) {
-
-            console.error(
-                'Registration error:',
-                error
-            );
-
-            setShowerr(
-                'Unable to connect to the server. Please try again.'
-            );
+            if (json.error) {
+                setShowerr(json.error);
+            }
+        } catch (e) {
+            console.log("Error fetching details: " + e.message);
         }
     };
 
