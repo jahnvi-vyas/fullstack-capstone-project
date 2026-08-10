@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import MainPage from "./components/MainPage/MainPage";
+import DetailsPage from "./components/DetailsPage/DetailsPage";
 import LoginPage from "./components/LoginPage/LoginPage";
 import RegisterPage from "./components/RegisterPage/RegisterPage";
 import Navbar from "./components/Navbar/Navbar";
@@ -12,9 +13,20 @@ function App() {
             <Navbar />
 
             <Routes>
-                <Route path="/" element={<MainPage />} />
+                <Route
+                    path="/"
+                    element={<MainPage />}
+                />
 
-                <Route path="/app" element={<MainPage />} />
+                <Route
+                    path="/app"
+                    element={<MainPage />}
+                />
+
+                <Route
+                    path="/app/product/:productId"
+                    element={<DetailsPage />}
+                />
 
                 <Route
                     path="/app/login"

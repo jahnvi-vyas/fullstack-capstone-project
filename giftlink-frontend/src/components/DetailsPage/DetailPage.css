@@ -1,0 +1,64 @@
+/* Style for image placeholder */
+.image-placeholder-large {
+    width: 100%;
+    height: 400px;
+    position: relative;
+    background-color: #f4f4f4;
+    overflow: hidden;
+    border-radius: 0.5rem;
+}
+
+/* Style for product image */
+.product-image-large {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Style for 'no image available' placeholder */
+.no-image-available-large {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e9ecef;
+    font-size: 1.25rem;
+    color: #6c757d;
+}
+
+/* Style for card header */
+.card-header {
+    background-color: #0056b3;
+    color: white;
+    padding: 1rem 1.25rem;
+}
+
+/* Style for details title */
+.details-title {
+    font-size: 1.8rem;
+    color: white;
+    font-weight: 600;
+}
+
+/* Style for comments section */
+.comments-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+}
+
+.comments-section h4 {
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.comment-item {
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    background-color: white;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+}
