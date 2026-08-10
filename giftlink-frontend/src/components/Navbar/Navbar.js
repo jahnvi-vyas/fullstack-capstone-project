@@ -1,61 +1,160 @@
-import React from "react";
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import urlConfig from '../../config';
+import { useAppContext } from '../../context/AuthContext';
+import './Navbar.css';
 
-const Navbar = () => {
+export default function Navbar() {
+    const {
+        isLoggedIn,
+        setIsLoggedIn,
+        userName,
+        setUserName
+    } = useAppContext();
+
+    const navigate = useNavigate();
+    const [menuOpen, setMenuOpen] = useState(false);
+
+    useEffect(() => {
+        const authToken = sessionStorage.getItem('auth-token');
+        const storedName = sessionStorage.getItem('name');
+
+        if (authToken && storedName) {
+            setUserName(storedName);
+            setIsLoggedIn(true);
+        }
+    }, [setIsLoggedIn, setUserName]);
+
+    const closeMenu = () => {
+        setMenuOpen(false);
+    };
+
+    const handleLogout = () => {
+        sessionStorage.removeItem('auth-token');
+        sessionStorage.removeItem('name');
+        sessionStorage.removeItem('email');
+
+        setIsLoggedIn(false);
+        setUserName('');
+
+        closeMenu();
+        navigate('/app');
+    };
+
+    const handleProfile = () => {
+        closeMenu();
+        navigate('/app/profile');
+    };
+
     return (
-        <nav className="navbar navbar-expand-lg navbar-light bg-light">
-            <div className="container">
-                <a className="navbar-brand" href="/app">
-                    GiftLink
-                </a>
+        <header className="giftlink-navbar">
+            <div className="navbar-container">
 
+                {/* Logo */}
+                <Link
+                    to="/app"
+                    className="navbar-logo"
+                    onClick={closeMenu}
+                >
+                    <span className="logo-icon">🎁</span>
+                    <span className="logo-text">
+                        Gift<span>Link</span>
+                    </span>
+                </Link>
+
+                {/* Mobile Menu Button */}
                 <button
-                    className="navbar-toggler"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav"
-                    aria-controls="navbarNav"
-                    aria-expanded="false"
+                    className={`mobile-menu-button ${menuOpen ? 'active' : ''}`}
+                    onClick={() => setMenuOpen(!menuOpen)}
                     aria-label="Toggle navigation"
                 >
-                    <span className="navbar-toggler-icon"></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </button>
 
-                <div className="collapse navbar-collapse" id="navbarNav">
-                    <ul className="navbar-nav">
-                        <li className="nav-item">
-                            <a className="nav-link" href="/home.html">
-                                Home
-                            </a>
-                        </li>
+                {/* Navigation */}
+                <nav className={`navbar-navigation ${menuOpen ? 'open' : ''}`}>
 
-                        <li className="nav-item">
-                            <a className="nav-link" href="/app">
-                                Gifts
-                            </a>
-                        </li>
+                    <Link
+                        to="/app"
+                        className="navbar-link"
+                        onClick={closeMenu}
+                    >
+                        <span className="nav-icon">⌂</span>
+                        Home
+                    </Link>
 
-                        <li className="nav-item">
-                            <a className="nav-link" href="/app/search">
-                                Search
-                            </a>
-                        </li>
+                    <Link
+                        to="/app"
+                        className="navbar-link"
+                        onClick={closeMenu}
+                    >
+                        <span className="nav-icon">🎁</span>
+                        Gifts
+                    </Link>
 
-                        <li className="nav-item">
-                            <a className="nav-link" href="/app/login">
+                    <Link
+                        to="/app/search"
+                        className="navbar-link"
+                        onClick={closeMenu}
+                    >
+                        <span className="nav-icon">⌕</span>
+                        Search
+                    </Link>
+
+                    <div className="navbar-divider"></div>
+
+                    {isLoggedIn ? (
+                        <div className="logged-in-section">
+
+                            <button
+                                className="profile-button"
+                                onClick={handleProfile}
+                            >
+                                <span className="profile-avatar">
+                                    {userName
+                                        ? userName.charAt(0).toUpperCase()
+                                        : 'U'}
+                                </span>
+
+                                <span className="profile-name">
+                                    {userName}
+                                </span>
+                            </button>
+
+                            <button
+                                className="logout-button"
+                                onClick={handleLogout}
+                            >
+                                Logout
+                            </button>
+
+                        </div>
+                    ) : (
+                        <div className="auth-buttons">
+
+                            <Link
+                                to="/app/login"
+                                className="login-button"
+                                onClick={closeMenu}
+                            >
                                 Login
-                            </a>
-                        </li>
+                            </Link>
 
-                        <li className="nav-item">
-                            <a className="nav-link" href="/app/register">
-                                Register
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                            <Link
+                                to="/app/register"
+                                className="register-button"
+                                onClick={closeMenu}
+                            >
+                                Get Started
+                            </Link>
+
+                        </div>
+                    )}
+
+                </nav>
             </div>
-        </nav>
+        </header>
     );
-};
-
-export default Navbar;
+}

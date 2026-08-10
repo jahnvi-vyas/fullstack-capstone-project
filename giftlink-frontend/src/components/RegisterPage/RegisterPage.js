@@ -1,198 +1,278 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-
-import './RegisterPage.css';
+import { Link, useNavigate } from 'react-router-dom';
 import urlConfig from '../../config';
 import { useAppContext } from '../../context/AuthContext';
+import './RegisterPage.css';
 
-function RegisterPage() {
-    // Form states
+export default function RegisterPage() {
+
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
-    // Error message state
     const [showerr, setShowerr] = useState('');
 
-    // Navigation and authentication context
     const navigate = useNavigate();
     const { setIsLoggedIn } = useAppContext();
 
-    const handleRegister = async () => {
+    const handleRegister = async (e) => {
+        e.preventDefault();
+
+        setShowerr('');
+
         try {
-            // Step 1: Call registration API
             const response = await fetch(
                 `${urlConfig.backendUrl}/api/auth/register`,
                 {
                     method: 'POST',
                     headers: {
-                        'content-type': 'application/json',
+                        'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        firstName: firstName,
-                        lastName: lastName,
-                        email: email,
-                        password: password
+                        firstName,
+                        lastName,
+                        email,
+                        password
                     })
                 }
             );
 
-            // Step 2: Access JSON response
             const json = await response.json();
 
-            // Successful registration
             if (json.authtoken) {
-                // Store authentication/user details
-                sessionStorage.setItem('auth-token', json.authtoken);
-                sessionStorage.setItem('name', firstName);
-                sessionStorage.setItem('email', json.email);
 
-                // Update login state
+                sessionStorage.setItem(
+                    'auth-token',
+                    json.authtoken
+                );
+
+                sessionStorage.setItem(
+                    'name',
+                    firstName
+                );
+
+                sessionStorage.setItem(
+                    'email',
+                    json.email || email
+                );
+
                 setIsLoggedIn(true);
 
-                // Navigate to MainPage
                 navigate('/app');
-            }
 
-            // Registration error
-            if (json.error) {
+            } else if (json.error) {
+
                 setShowerr(json.error);
+
+            } else {
+
+                setShowerr(
+                    'Registration failed. Please try again.'
+                );
             }
 
-        } catch (e) {
-            console.log('Error fetching details: ' + e.message);
-            setShowerr('Registration failed. Please try again.');
+        } catch (error) {
+
+            console.error(
+                'Registration error:',
+                error
+            );
+
+            setShowerr(
+                'Unable to connect to the server. Please try again.'
+            );
         }
     };
 
     return (
-        <div className="container mt-5">
-            <div className="row justify-content-center">
-                <div className="col-md-6 col-lg-4">
+        <main className="register-page">
 
-                    <div className="register-card p-4 border rounded">
+            <section className="register-wrapper">
 
-                        <h2 className="text-center mb-4 font-weight-bold">
-                            Register
+                {/* Left / Brand Section */}
+                <div className="register-brand">
+
+                    <div className="brand-badge">
+                        🎁
+                    </div>
+
+                    <h1>
+                        Give something
+                        <span> meaningful.</span>
+                    </h1>
+
+                    <p>
+                        Create your GiftLink account and discover
+                        thoughtful gifts for every special moment.
+                    </p>
+
+                    <div className="brand-points">
+
+                        <div className="brand-point">
+                            <span>✓</span>
+                            Discover thoughtful gifts
+                        </div>
+
+                        <div className="brand-point">
+                            <span>✓</span>
+                            Save your favorite products
+                        </div>
+
+                        <div className="brand-point">
+                            <span>✓</span>
+                            Manage your profile easily
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {/* Registration Card */}
+                <div className="register-card">
+
+                    <div className="register-header">
+
+                        <span className="welcome-label">
+                            GET STARTED
+                        </span>
+
+                        <h2>
+                            Create your account
                         </h2>
 
-                        {/* First Name */}
-                        <div className="mb-4">
-                            <label
-                                htmlFor="firstName"
-                                className="form-label"
-                            >
-                                First Name
-                            </label>
+                        <p>
+                            Join GiftLink today. It only takes a minute.
+                        </p>
 
-                            <input
-                                id="firstName"
-                                type="text"
-                                className="form-control"
-                                placeholder="Enter your first name"
-                                value={firstName}
-                                onChange={(e) =>
-                                    setFirstName(e.target.value)
-                                }
-                            />
+                    </div>
+
+                    {showerr && (
+                        <div className="register-error">
+                            <span>!</span>
+                            <p>{showerr}</p>
+                        </div>
+                    )}
+
+                    <form
+                        className="register-form"
+                        onSubmit={handleRegister}
+                    >
+
+                        <div className="form-row">
+
+                            <div className="form-group">
+
+                                <label htmlFor="firstName">
+                                    First name
+                                </label>
+
+                                <input
+                                    id="firstName"
+                                    type="text"
+                                    placeholder="Enter your first name"
+                                    value={firstName}
+                                    onChange={(e) =>
+                                        setFirstName(e.target.value)
+                                    }
+                                    required
+                                />
+
+                            </div>
+
+                            <div className="form-group">
+
+                                <label htmlFor="lastName">
+                                    Last name
+                                </label>
+
+                                <input
+                                    id="lastName"
+                                    type="text"
+                                    placeholder="Enter your last name"
+                                    value={lastName}
+                                    onChange={(e) =>
+                                        setLastName(e.target.value)
+                                    }
+                                    required
+                                />
+
+                            </div>
+
                         </div>
 
-                        {/* Last Name */}
-                        <div className="mb-4">
-                            <label
-                                htmlFor="lastName"
-                                className="form-label"
-                            >
-                                Last Name
-                            </label>
+                        <div className="form-group">
 
-                            <input
-                                id="lastName"
-                                type="text"
-                                className="form-control"
-                                placeholder="Enter your last name"
-                                value={lastName}
-                                onChange={(e) =>
-                                    setLastName(e.target.value)
-                                }
-                            />
-                        </div>
-
-                        {/* Email */}
-                        <div className="mb-4">
-                            <label
-                                htmlFor="email"
-                                className="form-label"
-                            >
-                                Email
+                            <label htmlFor="email">
+                                Email address
                             </label>
 
                             <input
                                 id="email"
                                 type="email"
-                                className="form-control"
-                                placeholder="Enter your email"
+                                placeholder="you@example.com"
                                 value={email}
                                 onChange={(e) =>
                                     setEmail(e.target.value)
                                 }
+                                required
                             />
 
-                            {/* Registration error */}
-                            {showerr && (
-                                <div className="text-danger mt-2">
-                                    {showerr}
-                                </div>
-                            )}
                         </div>
 
-                        {/* Password */}
-                        <div className="mb-4">
-                            <label
-                                htmlFor="password"
-                                className="form-label"
-                            >
-                                Password
-                            </label>
+                        <div className="form-group">
+
+                            <div className="label-row">
+
+                                <label htmlFor="password">
+                                    Password
+                                </label>
+
+                                <span>
+                                    Minimum 6 characters
+                                </span>
+
+                            </div>
 
                             <input
                                 id="password"
                                 type="password"
-                                className="form-control"
-                                placeholder="Enter your password"
+                                placeholder="Create a secure password"
                                 value={password}
                                 onChange={(e) =>
                                     setPassword(e.target.value)
                                 }
+                                minLength="6"
+                                required
                             />
+
                         </div>
 
-                        {/* Register Button */}
                         <button
-                            type="button"
-                            className="btn btn-primary w-100"
-                            onClick={handleRegister}
+                            type="submit"
+                            className="register-submit"
                         >
-                            Register
+                            Create account
+                            <span>→</span>
                         </button>
 
-                        {/* Login Link */}
-                        <p className="mt-4 text-center">
-                            Already a member?{' '}
-                            <a
-                                href="/app/login"
-                                className="text-primary"
-                            >
-                                Login
-                            </a>
-                        </p>
+                    </form>
+
+                    <div className="register-footer">
+
+                        <span>
+                            Already have an account?
+                        </span>
+
+                        <Link to="/app/login">
+                            Sign in
+                        </Link>
 
                     </div>
+
                 </div>
-            </div>
-        </div>
+
+            </section>
+
+        </main>
     );
 }
-
-export default RegisterPage;
