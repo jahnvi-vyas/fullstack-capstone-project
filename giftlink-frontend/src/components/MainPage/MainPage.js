@@ -187,10 +187,12 @@ export default function MainPage() {
 
                 <div className="gift-footer">
                   <strong>{gift.price}</strong>
-
-                  <Link to={`/app/details/${gift.id}`}>
-                    View gift →
-                  </Link>
+                    <Link
+                        to={`/app/product/${gift._id}`}
+                        className="view-gift-btn"
+                    >
+                        View Gift
+                    </Link>
                 </div>
               </div>
 

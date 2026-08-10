@@ -133,8 +133,6 @@ export default function LoginPage() {
                 </label>
 
                 <div className="input-wrapper">
-                  <span className="input-icon">✉</span>
-
                   <input
                     id="email"
                     type="email"
@@ -159,8 +157,6 @@ export default function LoginPage() {
                 </div>
 
                 <div className="input-wrapper">
-                  <span className="input-icon">🔒</span>
-
                   <input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
