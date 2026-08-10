@@ -21,7 +21,7 @@ const Navbar = () => {
                 </button>
 
                 <div className="collapse navbar-collapse" id="navbarNav">
-                    <ul className="navbar-nav ms-auto">
+                    <ul className="navbar-nav">
                         <li className="nav-item">
                             <a className="nav-link" href="/home.html">
                                 Home
@@ -31,6 +31,24 @@ const Navbar = () => {
                         <li className="nav-item">
                             <a className="nav-link" href="/app">
                                 Gifts
+                            </a>
+                        </li>
+
+                        <li className="nav-item">
+                            <a className="nav-link" href="/app/search">
+                                Search
+                            </a>
+                        </li>
+
+                        <li className="nav-item">
+                            <a className="nav-link" href="/app/login">
+                                Login
+                            </a>
+                        </li>
+
+                        <li className="nav-item">
+                            <a className="nav-link" href="/app/register">
+                                Register
                             </a>
                         </li>
                     </ul>
