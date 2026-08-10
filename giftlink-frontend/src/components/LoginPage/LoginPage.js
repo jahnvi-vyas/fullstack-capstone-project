@@ -1,25 +1,122 @@
-import React, { useState } from "react";
-import "./LoginPage.css";
+import React, { useState, useEffect } from 'react';
+import './LoginPage.css';
+
+import { useNavigate } from 'react-router-dom';
+import urlConfig from '../../config';
+import { useAppContext } from '../../context/AuthContext';
 
 function LoginPage() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    // Login form states
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    // Error message state
+    const [incorrect, setIncorrect] = useState('');
+
+    // Navigation and authentication
+    const navigate = useNavigate();
+    const bearerToken = sessionStorage.getItem('auth-token');
+    const { setIsLoggedIn } = useAppContext();
+
+    // If already logged in, go to MainPage
+    useEffect(() => {
+        if (sessionStorage.getItem('auth-token')) {
+            navigate('/app');
+        }
+    }, [navigate]);
 
     const handleLogin = async () => {
-        console.log("Inside handleLogin");
-        console.log("Email:", email);
-        console.log("Password:", password);
+        try {
+            const response = await fetch(
+                `${urlConfig.backendUrl}/api/auth/login`,
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'content-type': 'application/json',
+                        'Authorization': bearerToken
+                            ? `Bearer ${bearerToken}`
+                            : '',
+                    },
+
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                }
+            );
+
+            const json = await response.json();
+
+            // Successful login
+            if (json.authtoken) {
+                sessionStorage.setItem(
+                    'auth-token',
+                    json.authtoken
+                );
+
+                sessionStorage.setItem(
+                    'name',
+                    json.userName
+                );
+
+                sessionStorage.setItem(
+                    'email',
+                    json.userEmail
+                );
+
+                setIsLoggedIn(true);
+
+                navigate('/app');
+            } else {
+                // Login failed
+                setEmail('');
+                setPassword('');
+
+                setIncorrect('Wrong password. Try again.');
+
+                setTimeout(() => {
+                    setIncorrect('');
+                }, 2000);
+            }
+
+        } catch (e) {
+            console.log(
+                'Error fetching details: ' + e.message
+            );
+
+            setIncorrect(
+                'Unable to login. Please try again.'
+            );
+
+            setTimeout(() => {
+                setIncorrect('');
+            }, 2000);
+        }
     };
 
     return (
         <div className="container mt-5">
             <div className="row justify-content-center">
                 <div className="col-md-6 col-lg-4">
+
                     <div className="login-card p-4 border rounded">
+
                         <h2 className="text-center mb-4 font-weight-bold">
                             Login
                         </h2>
 
+                        {/* Error message */}
+                        {incorrect && (
+                            <div
+                                className="alert alert-danger"
+                                role="alert"
+                            >
+                                {incorrect}
+                            </div>
+                        )}
+
+                        {/* Email */}
                         <div className="mb-3">
                             <label
                                 htmlFor="email"
@@ -40,6 +137,7 @@ function LoginPage() {
                             />
                         </div>
 
+                        {/* Password */}
                         <div className="mb-3">
                             <label
                                 htmlFor="password"
@@ -60,6 +158,7 @@ function LoginPage() {
                             />
                         </div>
 
+                        {/* Login button */}
                         <button
                             type="button"
                             className="btn btn-primary w-100"
@@ -69,7 +168,7 @@ function LoginPage() {
                         </button>
 
                         <p className="mt-4 text-center">
-                            New here?{" "}
+                            New here?{' '}
                             <a
                                 href="/app/register"
                                 className="text-primary"
@@ -77,6 +176,7 @@ function LoginPage() {
                                 Register Here
                             </a>
                         </p>
+
                     </div>
                 </div>
             </div>
