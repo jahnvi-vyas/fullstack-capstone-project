@@ -25,11 +25,20 @@ router.get("/gifts/:id", async (req, res) => {
     try {
         const db = await connectToDatabase();
         const collection = db.collection("items");
-
-        // Your existing ObjectId lookup code goes here
-
+        const { id } = req.params;
+        console.log("Requested ID:", id);
+        const item = await collection.findOne({
+            _id: id
+        });
+        console.log("Found item:", item);
+        if (!item) {
+            return res.status(404).json({
+                error: "Item not found"
+            });
+        }
+        res.status(200).json(item);
     } catch (e) {
-        console.error(e);
+        console.error("Error fetching gift:", e);
         res.status(500).json({
             error: "Internal server error"
         });
